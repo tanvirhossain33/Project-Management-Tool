@@ -2,6 +2,7 @@
 using Project_Management_Tool.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using System.Web;
@@ -13,7 +14,7 @@ namespace Project_Management_Tool.Controllers
     public class AccountController : Controller
     {
         private ApplicationContext db = new ApplicationContext();
-        
+
 
 
 
@@ -22,7 +23,7 @@ namespace Project_Management_Tool.Controllers
         {
             var user = Session["user"] as User;
 
-            if(user != null)
+            if (user != null)
             {
                 return RedirectToAction("index", "Home");
             }
@@ -35,7 +36,7 @@ namespace Project_Management_Tool.Controllers
         public ActionResult Login(User user)
         {
             var anyUser = db.Users.Any(c => c.Email == user.UserName && c.Password == user.Password && c.Status == "Active");
-            
+
             if (anyUser)
             {
                 var userInfo = db.Users.FirstOrDefault(c => c.Email == user.UserName);
@@ -78,16 +79,16 @@ namespace Project_Management_Tool.Controllers
             {
                 new SelectListItem{Text = "Active", Value = "Active"},
                 new SelectListItem{Text = "InActive", Value = "InActive"}
-                
+
 
             };
-            
+
             var user = Session["user"] as User;
-            if(user != null)
+            if (user != null)
             {
-                if(user.UserDesignationId == 1)
+                if (user.UserDesignationId == 1)
                 {
-                    
+
 
                     ViewBag.Status = new SelectList(Status, "Text", "Value");
                     ViewBag.UserDesignationId = new SelectList(db.UserDesignations/*.Where(c => c.Id != 1)*/, "Id", "Type");
@@ -97,7 +98,7 @@ namespace Project_Management_Tool.Controllers
                     return View();
                 }
             }
-            return RedirectToAction("Login","Account");
+            return RedirectToAction("Login", "Account");
         }
 
         [HttpPost]
@@ -118,10 +119,10 @@ namespace Project_Management_Tool.Controllers
                 {
                     ViewBag.Status = new SelectList(Status, "Text", "Value");
                     ViewBag.UserDesignationId = new SelectList(db.UserDesignations/*.Where(c => c.Id != 1)*/, "Id", "Type");
-                    
+
                     string message = "";
                     db.Configuration.ValidateOnSaveEnabled = false;
-                   
+
                     db.Users.Add(user);
                     var rowChange = db.SaveChanges();
 
@@ -167,6 +168,88 @@ namespace Project_Management_Tool.Controllers
                 }
             }
             return RedirectToAction("Login", "Account");
+        }
+
+
+        public ActionResult UpdateUser(int id)
+        {
+            IList<SelectListItem> Status = new List<SelectListItem>
+            {
+                new SelectListItem{Text = "Active", Value = "Active"},
+                new SelectListItem{Text = "InActive", Value = "InActive"}
+
+
+            };
+
+            var user = Session["user"] as User;
+            if (user != null)
+            {
+                if (user.UserDesignationId == 1)
+                {
+
+
+                    ViewBag.Status = new SelectList(Status, "Text", "Value");
+                    ViewBag.UserDesignationId = new SelectList(db.UserDesignations/*.Where(c => c.Id != 1)*/, "Id", "Type");
+
+                    ViewBag.SingleUserInfo = db.Users.FirstOrDefault(c => c.Id == id);
+
+                    ViewBag.AllUsers = db.Users.ToList();
+                    ViewBag.Message = null;
+                    return View();
+                }
+            }
+            return RedirectToAction("Login", "Account");
+        }
+
+        [HttpPost]
+        public ActionResult UpdateUser(User user, int id)
+        {
+            IList<SelectListItem> Status = new List<SelectListItem>
+            {
+                new SelectListItem{Text = "Active", Value = "Active"},
+                new SelectListItem{Text = "InActive", Value = "InActive"}
+
+
+            };
+
+            var allUser = Session["user"] as User;
+            if (allUser != null)
+            {
+                if (allUser.UserDesignationId == 1)
+                {
+                    ViewBag.Status = new SelectList(Status, "Text", "Value");
+                    ViewBag.UserDesignationId = new SelectList(db.UserDesignations/*.Where(c => c.Id != 1)*/, "Id", "Type");
+
+                    string message = "";
+                    db.Configuration.ValidateOnSaveEnabled = false;
+
+
+                    var update = db.Users.Find(id);
+                    update.Name = user.Name;
+                    //update.Email = user.Email;
+                    update.Password = user.Password;
+                    update.Status = user.Status;
+                    update.UserDesignationId = user.UserDesignationId;
+                    db.Entry(update).State = EntityState.Modified;
+                    var rowAffected = db.SaveChanges();
+                    if (rowAffected > 0)
+                    {
+                        message = "Update Successfull";
+                    }
+                    else
+                    {
+                        message = "Update Failed";
+                    }
+
+                    ViewBag.SingleUserInfo = db.Users.FirstOrDefault(c => c.Id == id);
+                    ViewBag.AllUsers = db.Users.ToList();
+                    ViewBag.Message = message;
+
+                    return View();
+                }
+            }
+            return RedirectToAction("Login", "Account");
+
         }
     }
 }
