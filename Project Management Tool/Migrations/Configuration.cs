@@ -7,6 +7,8 @@ namespace Project_Management_Tool.Migrations
 
     internal sealed class Configuration : DbMigrationsConfiguration<Project_Management_Tool.Context.ApplicationContext>
     {
+
+
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;

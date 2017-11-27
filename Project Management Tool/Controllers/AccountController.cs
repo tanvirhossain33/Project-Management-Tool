@@ -2,6 +2,7 @@
 using Project_Management_Tool.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -12,6 +13,7 @@ namespace Project_Management_Tool.Controllers
     public class AccountController : Controller
     {
         private ApplicationContext db = new ApplicationContext();
+        
 
 
 
@@ -32,11 +34,11 @@ namespace Project_Management_Tool.Controllers
         [HttpPost]
         public ActionResult Login(User user)
         {
-            var anyUser = db.Users.Any(c => c.Email == user.Email && c.Password == user.Password && c.Status == true);
-
+            var anyUser = db.Users.Any(c => c.Email == user.UserName && c.Password == user.Password && c.Status == "Active");
+            
             if (anyUser)
             {
-                var userInfo = db.Users.FirstOrDefault(c => c.Email == user.Email);
+                var userInfo = db.Users.FirstOrDefault(c => c.Email == user.UserName);
 
                 Session["user"] = new User()
                 {
@@ -62,6 +64,108 @@ namespace Project_Management_Tool.Controllers
         {
             Session.Clear();
             FormsAuthentication.SignOut();
+            return RedirectToAction("Login", "Account");
+        }
+
+        public JsonResult IsEmailAvailable(string email)
+        {
+            return Json(!db.Users.Any(c => c.Email == email), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult AddUser()
+        {
+            IList<SelectListItem> Status = new List<SelectListItem>
+            {
+                new SelectListItem{Text = "Active", Value = "Active"},
+                new SelectListItem{Text = "InActive", Value = "InActive"}
+                
+
+            };
+            
+            var user = Session["user"] as User;
+            if(user != null)
+            {
+                if(user.UserDesignationId == 1)
+                {
+                    
+
+                    ViewBag.Status = new SelectList(Status, "Text", "Value");
+                    ViewBag.UserDesignationId = new SelectList(db.UserDesignations/*.Where(c => c.Id != 1)*/, "Id", "Type");
+
+                    ViewBag.AllUsers = db.Users.ToList();
+                    ViewBag.Message = null;
+                    return View();
+                }
+            }
+            return RedirectToAction("Login","Account");
+        }
+
+        [HttpPost]
+        public ActionResult AddUser(User user)
+        {
+            IList<SelectListItem> Status = new List<SelectListItem>
+            {
+                new SelectListItem{Text = "Active", Value = "Active"},
+                new SelectListItem{Text = "InActive", Value = "InActive"}
+
+
+            };
+
+            var allUser = Session["user"] as User;
+            if (allUser != null)
+            {
+                if (allUser.UserDesignationId == 1)
+                {
+                    ViewBag.Status = new SelectList(Status, "Text", "Value");
+                    ViewBag.UserDesignationId = new SelectList(db.UserDesignations/*.Where(c => c.Id != 1)*/, "Id", "Type");
+                    
+                    string message = "";
+                    db.Configuration.ValidateOnSaveEnabled = false;
+                   
+                    db.Users.Add(user);
+                    var rowChange = db.SaveChanges();
+
+
+                    //try
+                    //{
+                    //    // Your code...
+                    //    // Could also be before try if you know the exception occurs in SaveChanges
+
+                    //    db.SaveChanges();
+                    //}
+                    //catch (DbEntityValidationException e)
+                    //{
+                    //    foreach (var eve in e.EntityValidationErrors)
+                    //    {
+                    //        Console.WriteLine("Entity of type \"{0}\" in state \"{1}\" has the following validation errors:",
+                    //            eve.Entry.Entity.GetType().Name, eve.Entry.State);
+                    //        foreach (var ve in eve.ValidationErrors)
+                    //        {
+                    //            Console.WriteLine("- Property: \"{0}\", Value: \"{1}\", Error: \"{2}\"",
+                    //                ve.PropertyName,
+                    //                eve.Entry.CurrentValues.GetValue<object>(ve.PropertyName),
+                    //                ve.ErrorMessage);
+                    //        }
+                    //    }
+                    //    throw;
+                    //}
+
+
+
+                    if (rowChange > 0)
+                    {
+                        message = "User add successfull ..";
+                    }
+                    else
+                    {
+                        message = "User add failed !!";
+                    }
+                    ViewBag.AllUsers = db.Users.ToList();
+                    ViewBag.Message = message;
+
+                    return View();
+                }
+            }
             return RedirectToAction("Login", "Account");
         }
     }
