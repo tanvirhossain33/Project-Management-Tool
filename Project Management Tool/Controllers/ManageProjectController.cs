@@ -1,7 +1,10 @@
 ﻿using Project_Management_Tool.Context;
 using Project_Management_Tool.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -165,22 +168,45 @@ namespace Project_Management_Tool.Controllers
 
 
 
-        //public ActionResult AllProject()
-        //{
-        //    var user = Session["user"] as User;
+        public ActionResult AllProject()
+        {
+            var user = Session["user"] as User;
 
-        //    if(user != null && user.UserDesignationId == 2)
-        //    {
-        //        var projects = db.ProjectTeams.Where(c => c.UserId == user.Id).Count(c );
+            if (user != null && user.UserDesignationId == 2)
+            {
+                
+                var proj = db.ProjectTeams.GroupBy(b => new { b.Project.Id, b.Project.Name, b.Project.CodeName, b.Project.Status }).Select(g => new { g.Key.Id, g.Key.Name, g.Key.CodeName, g.Key.Status, Count = g.Count() }).ToList();
+
+                var task = db.Tasks.GroupBy(b => new { b.Project.Id }).Select(g => new { g.Key.Id, Count = g.Count() }).ToList();
+
+                var result = proj.Join(task,
+                    a => a.Id,
+                    b => b.Id,
+                    (b, a) => new { Member = b, Task = a }).ToList();
+
+                List<ProjectInvolved> list = new List<ProjectInvolved>();
+
+                foreach(var item in result)
+                {
+                    ProjectInvolved projectInvolved = new ProjectInvolved()
+                    {   
+                        Id = item.Member.Id,
+                        Name = item.Member.Name,
+                        CodeName = item.Member.CodeName,
+                        Status = item.Member.Status,
+                        NOM = item.Member.Count,
+                        NOT = item.Task.Count
+                    };
+                    list.Add(projectInvolved);
+                }
+                
+                ViewBag.AllProject = list;
+                return View();
+            }
+            return RedirectToAction("Login", "Account");
+
+        }
 
 
-
-
-        //        ViewBag.AllProject = projects;
-        //        return View();
-        //    }
-        //    return RedirectToAction("Login", "Account");
-
-        //}
     }
 }

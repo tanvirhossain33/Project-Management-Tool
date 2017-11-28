@@ -2,7 +2,13 @@
 @{
     ViewBag.Title = "AllProject";
     var allProject = ViewBag.AllProject;
+    
+    
 }
+
+<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+
 
 <div class="container">
     <h3 class="section-title">View All Projects in which you are Involved</h3>
@@ -16,7 +22,7 @@
                     <th>Code Name</th>
                     <th>Status</th>
                     <th>No of Members</th>
-                    @*<th>No of Tasks</th>*@
+                    <th>No of Tasks</th>
                     <th></th>
 
                 </tr>
@@ -24,14 +30,18 @@
 
             <tbody>
                 @foreach (var item in allProject)
-                {
+                {   
                         <tr>
                             <td>@item.Name</td>
                             <td>@item.CodeName</td>
                             <td>@item.Status</td>
-                            <td></td>
-                            <td>@Html.ActionLink("Update", "UpdateUser", new { id = item.Id }, new { @class = "btn btn-info" })</td>
-
+                            <td>@item.NOM</td>
+                            <td>@item.NOT</td>
+                            <td>
+                                @Html.ActionLink("Details", "UpdateUser", new { id = item.Id }, new { @class = "btn btn-success" })
+                                @Html.ActionLink("Update Project", "UpdateUser", new { id = item.Id }, new { @class = "btn btn-info" })
+                            </td>
+                            
                         </tr>
                 }
 
@@ -40,3 +50,17 @@
     </div>
 </div>
 
+@section Scripts{
+
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/DataTables/dataTables.bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+        });
+
+    </script>
+
+
+}
