@@ -151,6 +151,7 @@
     <Compile Include="Context\ApplicationContext.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ManageProjectController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -431,9 +432,12 @@
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\AddUser.cshtml" />
     <Content Include="Views\Account\UpdateUser.cshtml" />
+    <Content Include="Views\ManageProject\AddProject.cshtml" />
+    <Content Include="Views\ManageProject\AllProject.cshtml" />
+    <Content Include="Views\ManageProject\AssignPerson.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <Folder Include="App_Data\ProjectFiles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

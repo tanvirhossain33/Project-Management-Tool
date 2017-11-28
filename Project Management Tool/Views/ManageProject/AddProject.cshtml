@@ -1,0 +1,146 @@
+﻿@model Project_Management_Tool.Models.Project
+
+@{
+    ViewBag.Title = "AddProject";
+    var message = ViewBag.Message;
+    var status = ViewBag.Status;
+}
+
+@using (Html.BeginForm("AddProject", "ManageProject", FormMethod.Post, new {@id = "myForm", @role = "form", enctype = "multipart/form-data" }))
+{
+    <div class="col-md-8">
+        <h3 class="section-title">Add New Project</h3>
+        <hr><br><br>
+
+
+        @if (message != null)
+        {
+            if (message == "Project Created Successfull")
+            {
+                <div class="well well-lg " style="color: forestgreen">
+                    @message
+                </div>
+            }
+            else
+            {
+                <div class="well well-lg field-validation-error">
+                    @message
+                </div>
+            }
+
+        }
+
+
+
+
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            <label>Name</label>
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control", placeholder = " Project Name" })
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+
+        <div class="form-group">
+            <label>Code Name</label>
+            @Html.TextBoxFor(model => model.CodeName, new { @class = "form-control", placeholder = " Project Code Name" })
+            @Html.ValidationMessageFor(model => model.CodeName)
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = " Project Description", style = "height: 100px" })
+            @Html.ValidationMessageFor(model => model.Description)
+        </div>
+
+        <div class="form-group">
+            <label>Possible Start Date</label>
+            @Html.TextBoxFor(model => model.StartDate, new { @class = "form-control", @type = "date" })
+            @Html.ValidationMessageFor(model => model.StartDate)
+        </div>
+
+        <div class="form-group">
+            <label>Possible End Date</label>
+            @Html.TextBoxFor(model => model.EndDate, new { @class = "form-control", @type = "date" })
+            @Html.ValidationMessageFor(model => model.EndDate)
+        </div>
+
+        <div class="form-group">
+            <label>Duration (in Days)</label>
+            @Html.TextBoxFor(model => model.Duration, new { @class = "form-control", placeholder = " Duration"@*, @disabled = "disabled"*@ })
+            @Html.ValidationMessageFor(model => model.Duration)
+        </div>
+
+        <div class="form-group">
+            <label>Upload File</label>
+            <input type="file" name="file" id="file" class="form-control" @*onchange="readURL(this);"*@ @*accept="image/gif, image/jpeg, image/png, image/jpg"*@ required />
+        </div>
+
+        <div class="form-group">
+            <label>Status</label>
+            @Html.DropDownList("Status", null, "Select", new { @class = "form-control", required = "required" })
+            @Html.ValidationMessageFor(model => model.Status)
+        </div>
+
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-success">Save</button>
+        </div>
+    </div>
+}
+
+
+
+
+@section Scripts{
+
+    <script>
+        $('#StartDate').change(function () {
+            var dtFrom = document.getElementById('StartDate').value;
+            var dtTo = document.getElementById('EndDate').value;
+
+            var dt1 = new Date(dtFrom);
+            var dt2 = new Date(dtTo);
+
+            var diff = dt2.getTime() - dt1.getTime();
+            var days = (diff / (1000 * 60 * 60 * 24))+1;
+
+            $('#Duration').val(days);
+        });
+        $('#EndDate').change(function () {
+            var dtFrom = document.getElementById('StartDate').value;
+            var dtTo = document.getElementById('EndDate').value;
+
+            var dt1 = new Date(dtFrom);
+            var dt2 = new Date(dtTo);
+
+            var diff = dt2.getTime() - dt1.getTime();
+            var days = (diff / (1000 * 60 * 60 * 24)) + 1;
+
+            $('#Duration').val(days);
+        });
+        $('#Duration').change(function () {
+            var dtFrom = document.getElementById('StartDate').value;
+            var dtTo = document.getElementById('EndDate').value;
+
+            var dt1 = new Date(dtFrom);
+            var dt2 = new Date(dtTo);
+
+            var diff = dt2.getTime() - dt1.getTime();
+            var days = (diff / (1000 * 60 * 60 * 24)) + 1;
+
+            $('#Duration').val(days);
+        });
+    </script>
+
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+
+
+}
+

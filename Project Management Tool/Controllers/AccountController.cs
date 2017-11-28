@@ -25,7 +25,10 @@ namespace Project_Management_Tool.Controllers
 
             if (user != null)
             {
-                return RedirectToAction("index", "Home");
+                if (user.UserDesignationId == 1)
+                    return RedirectToAction("index", "Home");
+                else if (user.UserDesignationId == 2)
+                    return RedirectToAction("AddProject", "ManageProject");
             }
 
             ViewBag.Message = null;
@@ -50,8 +53,9 @@ namespace Project_Management_Tool.Controllers
                     Status = userInfo.Status,
                     UserDesignationId = userInfo.UserDesignationId
                 };
-
-                return RedirectToAction("Index", "Home");
+                var currentUser = Session["user"] as User;
+                if(currentUser.UserDesignationId == 1) return RedirectToAction("Index", "Home");
+                else if (currentUser.UserDesignationId == 2) return RedirectToAction("AddProject", "ManageProject");
             }
 
 
