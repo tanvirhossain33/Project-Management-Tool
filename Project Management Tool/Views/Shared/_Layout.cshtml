@@ -41,6 +41,10 @@
                     {
                         @Html.ActionLink("Project Management Tool", "AddProject", "ManageProject", new { area = "" }, new { @class = "navbar-brand" })
                     }
+                    else
+                    {
+                        @Html.ActionLink("Project Management Tool", "AllProject", "ManageProject", new { area = "" }, new { @class = "navbar-brand" }) 
+                    }
                 }
                 else
                 {
@@ -61,6 +65,11 @@
                         {
                             <li>@Html.ActionLink("Add Project", "AddProject", "ManageProject")</li>
                             <li>@Html.ActionLink("Assign Resource Person", "AssignPerson", "ManageProject")</li>
+
+                        }
+                        
+                        if (user.UserDesignationId != 1)
+                        {
                             <li>@Html.ActionLink("View All Project", "AllProject", "ManageProject")</li>
                         }
                         <li>@Html.ActionLink("Logout", "Logout", "Account")</li>

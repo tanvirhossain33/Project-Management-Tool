@@ -1,9 +1,10 @@
-﻿
+﻿@using Project_Management_Tool.Models
+
 @{
     ViewBag.Title = "AllProject";
     var allProject = ViewBag.AllProject;
-    
-    
+    dynamic user = Session["user"] as User;
+
 }
 
 <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
@@ -23,6 +24,7 @@
                     <th>Status</th>
                     <th>No of Members</th>
                     <th>No of Tasks</th>
+                    
                     <th></th>
 
                 </tr>
@@ -39,7 +41,11 @@
                             <td>@item.NOT</td>
                             <td>
                                 @Html.ActionLink("Details", "UpdateUser", new { id = item.Id }, new { @class = "btn btn-success" })
-                                @Html.ActionLink("Update Project", "UpdateUser", new { id = item.Id }, new { @class = "btn btn-info" })
+                                @if(user != null && user.UserDesignationId == 2)
+                                {
+                                    @Html.ActionLink("Update Project", "UpdateProjectDetails", new { id = item.Id }, new { @class = "btn btn-info" })
+                                }
+                                
                             </td>
                             
                         </tr>

@@ -48,12 +48,11 @@
             @Html.ValidationMessageFor(model => model.Name)
         </div>
 
-        @*<div class="form-group">
+        <div class="form-group">
             <label>Email</label>
-            @Html.TextBoxFor(model => model.Email, new { @Value = singleUserInfo.Email, @class = "form-control", placeholder = "Your Email" })
+            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = " Email Address", @disabled = "disabled" })
             @Html.ValidationMessageFor(model => model.Email)
-
-        </div>*@
+        </div>
 
         <div class="form-group">
             <label>Default Password</label>
