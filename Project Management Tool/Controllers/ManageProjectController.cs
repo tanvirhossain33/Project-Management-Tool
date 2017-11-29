@@ -158,7 +158,7 @@ namespace Project_Management_Tool.Controllers
             var user = Session["user"] as User;
             if (user != null && user.UserDesignationId != 1)
             {
-                var proj = db.ProjectTeams.GroupBy(b => new { b.Project.Id, b.Project.Name, b.Project.CodeName, b.Project.Status }).Select(g => new { g.Key.Id, g.Key.Name, g.Key.CodeName, g.Key.Status, Count = g.Count() }).ToList();
+                var proj = db.ProjectTeams.GroupBy(b => new { b.Project.Id, b.Project.Name, b.Project.CodeName, b.Project.Status, b.UserId }).Select(g => new { g.Key.Id, g.Key.Name, g.Key.CodeName, g.Key.Status, g.Key.UserId, Count = g.Count() }).ToList();
                 var task = db.Tasks.GroupBy(b => new { b.Project.Id }).Select(g => new { g.Key.Id, Count = g.Count() }).ToList();
                 var result = proj.Join(task,
                     a => a.Id,
@@ -167,16 +167,21 @@ namespace Project_Management_Tool.Controllers
                 List<ProjectInvolved> list = new List<ProjectInvolved>();
                 foreach(var item in result)
                 {
-                    ProjectInvolved projectInvolved = new ProjectInvolved()
-                    {   
-                        Id = item.Member.Id,
-                        Name = item.Member.Name,
-                        CodeName = item.Member.CodeName,
-                        Status = item.Member.Status,
-                        NOM = item.Member.Count,
-                        NOT = item.Task.Count
-                    };
-                    list.Add(projectInvolved);
+                    if(item.Member.UserId == user.Id)
+                    {
+                        ProjectInvolved projectInvolved = new ProjectInvolved()
+                        {
+                            Id = item.Member.Id,
+                            Name = item.Member.Name,
+                            CodeName = item.Member.CodeName,
+                            Status = item.Member.Status,
+                            NOM = item.Member.Count,
+                            NOT = item.Task.Count,
+                            UserId = item.Member.UserId
+                        };
+                        list.Add(projectInvolved);
+                    }
+                    
                 }
                 ViewBag.AllProject = list;
                 return View();
@@ -276,18 +281,14 @@ namespace Project_Management_Tool.Controllers
         public ActionResult ProjectDetails(int id)
         {
             var user = Session["user"] as User;
-
-            if(user != null && user.UserDesignationId != 1)
+            var any = db.ProjectTeams.Any(c => c.ProjectId == id && c.UserId == user.Id);
+            if (user != null && user.UserDesignationId != 1 && any == true)
             {
                 var projectDetails = db.Projects.FirstOrDefault(c => c.Id == id);
                 var assignedMember = db.ProjectTeams.Where(c => c.ProjectId == id).ToList();
-
-
                 var dir = new System.IO.DirectoryInfo(Server.MapPath("~/App_Data/ProjectFiles"));
                 System.IO.FileInfo[] fileNames = dir.GetFiles("*"+projectDetails.CodeName + ".*");
-
                 List<string> list = new List<string>();
-
                 if(fileNames.Length != 0)
                 {
                     foreach (var item in fileNames)
@@ -301,14 +302,17 @@ namespace Project_Management_Tool.Controllers
                 {
                     list = null;
                 }
+                var tasks = db.Tasks.Where(c => c.ProjectId == id).ToList();
+
                 
 
                 ViewBag.ProjectDetails = projectDetails;
                 ViewBag.AssignMember = assignedMember;
                 ViewBag.FileNames = list;
+                ViewBag.Tasks = tasks;
+                //ViewBag.ResourcePerson = any;
                 return View();
             }
-
             return RedirectToAction("Login","Account");
         }
 
@@ -317,27 +321,104 @@ namespace Project_Management_Tool.Controllers
             var session = Session["user"] as User;
             if (session != null && session.UserDesignationId != 1)
             {
-
                 string[] s = fileName.Split('.');
                 int len = s.Length;
                 string extension = "." + s[len - 1];
                 string name = fileName.Replace(extension, code + extension);
-
                 var dir = new System.IO.DirectoryInfo(Server.MapPath("~/App_Data/ProjectFiles"));
                 System.IO.FileInfo[] fileNames = dir.GetFiles(name);
-                
                 if (fileNames.Length > 0)
                 {
                     var data = File("~/App_Data/ProjectFiles/" + name, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
                     return data;
                 }
-                
             }
-            
-
-
             return RedirectToAction("Login", "Account");
         }
 
+
+        public ActionResult CreateTask()
+        {
+            var user = Session["user"] as User;
+            if (user != null && user.UserDesignationId != 1)
+            {
+                IList<SelectListItem> Priority = new List<SelectListItem>
+                {
+                    new SelectListItem{Text = "High", Value = "High"},
+                    new SelectListItem{Text = "Medium", Value = "Medium"},
+                    new SelectListItem{Text = "Low", Value = "Low"}
+                    
+                };
+                ViewBag.Priority = new SelectList(Priority, "Text", "Value");
+
+                ViewBag.Project = db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct().ToList();
+
+                //ViewBag.ProjectId = new SelectList(db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct(), "ProjectId", "Project.Name");
+
+                ViewBag.Message = null;
+                return View();
+            }
+
+
+            return RedirectToAction("Login","Account");
+        }
+
+        [HttpPost]
+        public ActionResult CreateTask(Task task)
+        {
+            var user = Session["user"] as User;
+            IList<SelectListItem> Priority = new List<SelectListItem>
+                {
+                    new SelectListItem{Text = "High", Value = "High"},
+                    new SelectListItem{Text = "Medium", Value = "Medium"},
+                    new SelectListItem{Text = "Low", Value = "Low"}
+
+                };
+            ViewBag.Priority = new SelectList(Priority, "Text", "Value");
+
+            ViewBag.Project = db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct().ToList();
+
+            //ViewBag.ProjectId = new SelectList(db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct(), "ProjectId", "Project.Name");
+
+            string message = "";
+
+            
+
+            var tasks = new Task()
+            {
+                Description = task.Description,
+                DueDate = task.DueDate,
+                Priority = task.Priority,
+                AssignedByUser = user.Name,
+                ProjectId = task.ProjectId,
+                UserId = task.UserId
+            };
+            db.Tasks.Add(tasks);
+
+            var rowAffected = db.SaveChanges();
+            if(rowAffected > 0)
+            {
+                message = "Task add Successfull";
+            }
+            else
+            {
+                message = "Task add Failed";
+            }
+
+            ViewBag.Message = message;
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult GetTeamMemberByProject(int projectId)
+        {
+            var users = db.ProjectTeams.Where(c => c.ProjectId == projectId).Select(a => new
+            {
+                id = a.UserId,
+                name = a.User.Name
+            });
+            
+            return Json(users, JsonRequestBehavior.AllowGet);
+        }
     }
 }

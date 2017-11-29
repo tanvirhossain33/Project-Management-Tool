@@ -22,6 +22,8 @@ namespace Project_Management_Tool.Models
         [Required]
         public string Priority { get; set; }
 
+        [Required]
+        public string AssignedByUser { get; set; }
 
         public int ProjectId { get; set; }
 

@@ -13,5 +13,7 @@ namespace Project_Management_Tool.Models
         public string Status { get; set; }
         public int NOM { get; set; }
         public int NOT { get; set; }
+
+        public int UserId { get; set; }
     }
 }

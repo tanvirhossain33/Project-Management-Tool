@@ -1,11 +1,16 @@
-﻿
+﻿@using System.Globalization
+@using Project_Management_Tool.Models
 @{
     ViewBag.Title = "ProjectDetails";
     var projectDetails = ViewBag.ProjectDetails;
     var assignedMembers = ViewBag.AssignMember;
     var fileNames = ViewBag.FileNames;
-}
+    var tasks = ViewBag.Tasks;
 
+    //var resourcePerson = ViewBag.ResourcePerson;
+}
+<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
 <style>
     .scrollable-menu {
         height: auto;
@@ -15,7 +20,7 @@
 </style>
 
 <div class="row">
-    <h3 class="section-title">Update Project Information</h3>
+    <h3 class="section-title">Project Details </h3>
     <hr><br>
     <div class="col-md-4">
         <div class="form-group">
@@ -106,7 +111,66 @@
     </div>
 
     <div class="col-md-8">
-        Started this section
+        <h3 class="section-title">All Tasks in this project </h3>
+        <hr>
+
+        <div class="row">
+            
+            <div style="text-align: right">
+                @Html.ActionLink("Create New Task", "CreateTask", new { @class = "btn btn-info" })
+            </div>
+            
+            <br>
+            <table id="myTable" class="table" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Assigned To</th>
+                        <th>Priority</th>
+                        <th>Assigned By</th>
+                        <th>Due Date</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in tasks)
+                    {
+                        <tr>
+                            <td>@item.Description</td>
+                            <td>@item.User.Name</td>
+                            <td>@item.Priority</td>
+                            <td>@item.AssignedByUser</td>
+                            <td>@item.DueDate.ToString("dd/M/yyyy", CultureInfo.InvariantCulture)</td>
+                            @*<td>
+                                @Html.ActionLink("Details", "ProjectDetails", new { id = item.Id }, new { @class = "btn btn-success" })
+                                @if (user != null && user.UserDesignationId == 2)
+                                {
+                                    @Html.ActionLink("Update Project", "UpdateProjectDetails", new { id = item.Id }, new { @class = "btn btn-info" })
+                                }
+
+                            </td>*@
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
+@section Scripts{
+
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/DataTables/dataTables.bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+        });
+
+    </script>
+
+
+}
