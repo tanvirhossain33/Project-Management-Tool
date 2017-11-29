@@ -1,5 +1,5 @@
 ﻿
-@model Project_Management_Tool.Models.Task
+@model Project_Management_Tool.Models.Comment
 @{
     ViewBag.Title = "CreateTask";
     var message = ViewBag.Message;
@@ -9,13 +9,13 @@
 @using (Html.BeginForm(new { @role = "form" }))
 {
     <div class="col-md-8">
-        <h3 class="section-title">Add New User</h3>
+        <h3 class="section-title">Add New Comment</h3>
         <hr><br><br>
 
 
         @if (message != null)
         {
-            if (message == "Task add Successfull")
+            if (message == "Comment add Successfull")
             {
                 <div class="well well-lg " style="color: forestgreen">
                     @message
@@ -45,33 +45,21 @@
                     <option value="@item.ProjectId">@item.Project.Name</option>
                 }
             </select>
-            @Html.ValidationMessageFor(model => model.ProjectId)
+            @Html.ValidationMessageFor(model => model.Task.ProjectId)
         </div>
 
         <div class="form-group">
-            <label>Assign To</label>
-            <select name="UserId" id="UserId" class="form-control" required>
+            <label>Select Task</label>
+            <select name="TaskId" id="TaskId" class="form-control" required>
                 <option value="">Select</option>
             </select>
-            @Html.ValidationMessageFor(model => model.UserId)
+            @Html.ValidationMessageFor(model => model.TaskId)
         </div>
 
         <div class="form-group">
-            <label>Description</label>
-            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = " Task Description", style = "height: 100px" })
-            @Html.ValidationMessageFor(model => model.Description)
-        </div>
-
-        <div class="form-group">
-            <label>Due Date</label>
-            @Html.TextBoxFor(model => model.DueDate, new { @class = "form-control", @type = "date" })
-            @Html.ValidationMessageFor(model => model.DueDate)
-        </div>
-
-        <div class="form-group">
-            <label>Priority</label>
-            @Html.DropDownList("Priority", null, "Select", new { @class = "form-control", required = "required" })
-            @Html.ValidationMessageFor(model => model.Priority)
+            <label>Comment</label>
+            @Html.TextAreaFor(model => model.Value, new { @class = "form-control", placeholder = " Comment Here", style = "height: 100px" })
+            @Html.ValidationMessageFor(model => model.Value)
         </div>
 
     </div>
@@ -92,26 +80,26 @@
 
     <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 
-<script>
+    <script>
         $(document)
             .ready(function () {
 
                 $("#ProjectId")
                     .change(function () {
 
-                        $("#UserId").empty();
+                        $("#TaskId").empty();
 
                         $.ajax({
                             type: "POST",
-                            url: "/ManageProject/GetTeamMemberByProject",
+                            url: "/ManageProject/GetTaskByProject",
                             data: '{projectId: "' + $("#ProjectId").val() + '" }',
                             contentType: "application/json; charset=utf-8",
                             dataType: "json",
                             success: function (data) {
-                                $("#UserId").append('<option value=' + "" + '>' + "Select" + '</option>');
+                                $("#TaskId").append('<option value=' + "" + '>' + "Select" + '</option>');
                                 $.each(data, function (key, value) {
 
-                                    $("#UserId").append('<option value=' + value.id + '>' + value.name + '</option>');
+                                    $("#TaskId").append('<option value=' + value.id + '>' + value.description + '</option>');
 
                                 });
                             },
@@ -119,13 +107,13 @@
                                 alert(response.responseText);
                             },
                             error: function (response) {
-                                $("#UserId").append('<option value=' + "" + '>' + "Select" + '</option>');
+                                $("#TaskId").append('<option value=' + "" + '>' + "Select" + '</option>');
                             }
                         });
 
 
                     });
             });
-</script>
+    </script>
 
 }

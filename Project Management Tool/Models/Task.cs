@@ -38,6 +38,6 @@ namespace Project_Management_Tool.Models
         public virtual User User { get; set; }
 
 
-        public virtual List<Comments> Commentses { get; set; }
+        public virtual List<Comment> Comments { get; set; }
     }
 }

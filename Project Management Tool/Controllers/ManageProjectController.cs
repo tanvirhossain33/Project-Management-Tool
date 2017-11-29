@@ -337,26 +337,31 @@ namespace Project_Management_Tool.Controllers
         }
 
 
-        public ActionResult CreateTask()
+        public ActionResult CreateTask(int projectId)
         {
             var user = Session["user"] as User;
             if (user != null && user.UserDesignationId != 1)
             {
-                IList<SelectListItem> Priority = new List<SelectListItem>
+                var any = db.ProjectTeams.Any(c => c.ProjectId == projectId && c.UserId == user.Id);
+                if (any)
                 {
-                    new SelectListItem{Text = "High", Value = "High"},
-                    new SelectListItem{Text = "Medium", Value = "Medium"},
-                    new SelectListItem{Text = "Low", Value = "Low"}
+                    IList<SelectListItem> Priority = new List<SelectListItem>
+                    {
+                        new SelectListItem{Text = "High", Value = "High"},
+                        new SelectListItem{Text = "Medium", Value = "Medium"},
+                        new SelectListItem{Text = "Low", Value = "Low"}
+
+                    };
+                    ViewBag.Priority = new SelectList(Priority, "Text", "Value");
+
+                    ViewBag.Project = db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct().ToList();
+
                     
-                };
-                ViewBag.Priority = new SelectList(Priority, "Text", "Value");
 
-                ViewBag.Project = db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct().ToList();
-
-                //ViewBag.ProjectId = new SelectList(db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct(), "ProjectId", "Project.Name");
-
-                ViewBag.Message = null;
-                return View();
+                    ViewBag.Message = null;
+                    return View();
+                }
+                
             }
 
 
@@ -419,6 +424,88 @@ namespace Project_Management_Tool.Controllers
             });
             
             return Json(users, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public ActionResult AddComment(int projectId)
+        {
+            var user = Session["user"] as User;
+            if(user != null && user.UserDesignationId != 1)
+            {
+                var any = db.ProjectTeams.Any(c => c.ProjectId == projectId && c.UserId == user.Id);
+                if (any)
+                {
+                    ViewBag.Project = db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct().ToList();
+                    ViewBag.Message = null;
+                    return View();
+                }
+            }
+
+            return RedirectToAction("Login", "Account");
+        }
+
+        [HttpPost]
+        public ActionResult AddComment(Comment comments, int projectId)
+        {
+            var user = Session["user"] as User;
+            var any = db.ProjectTeams.Any(c => c.ProjectId == projectId && c.UserId == user.Id);
+            if (any)
+            {
+                ViewBag.Project = db.ProjectTeams.Where(c => c.UserId == user.Id).Distinct().ToList();
+
+                string message = "";
+
+                var com = new Comment()
+                {
+                    Value = comments.Value,
+                    dateTime = DateTime.Now,
+                    CommentBy = user.Name,
+                    TaskId = comments.TaskId
+                };
+
+
+                db.Comments.Add(com);
+                var rowAffected = db.SaveChanges();
+                if(rowAffected > 0)
+                {
+                    message = "Comment add Successfull";
+                }
+                else
+                {
+                    message = "Comment add Failed";
+                }
+
+
+                ViewBag.Message = message;
+                return View();
+            }
+
+            return RedirectToAction("Login", "Account");
+        }
+
+
+        [HttpPost]
+        public JsonResult GetTaskByProject(int projectId)
+        {
+            var task = db.Tasks.Where(c => c.ProjectId == projectId).Select(a => new
+            {
+                id = a.Id,
+                description = a.Description
+            });
+
+            return Json(task, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ViewComments(int id)
+        {
+            var user = Session["user"] as User;
+            if(user != null && user.UserDesignationId != 1)
+            {
+                var comments = db.Comments.Where(c => c.TaskId == id).ToList();
+                ViewBag.AllComment = comments;
+                return View();
+            }
+            return RedirectToAction("Login", "Account");
         }
     }
 }

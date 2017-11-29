@@ -152,25 +152,12 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageProjectController.cs" />
-    <Compile Include="Controllers\ManageTaskController.cs" />
     <Compile Include="Controllers\SafeDynamic.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201711271445455_version1.cs" />
-    <Compile Include="Migrations\201711271445455_version1.Designer.cs">
-      <DependentUpon>201711271445455_version1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711271909554_version2.cs" />
-    <Compile Include="Migrations\201711271909554_version2.Designer.cs">
-      <DependentUpon>201711271909554_version2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711290954386_version3.cs" />
-    <Compile Include="Migrations\201711290954386_version3.Designer.cs">
-      <DependentUpon>201711290954386_version3.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\Comments.cs" />
+    <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Project.cs" />
     <Compile Include="Models\ProjectInvolved.cs" />
     <Compile Include="Models\ProjectTeam.cs" />
@@ -445,10 +432,11 @@
     <Content Include="Views\ManageProject\UpdateProjectDetails.cshtml" />
     <Content Include="Views\ManageProject\ProjectDetails.cshtml" />
     <Content Include="Views\ManageProject\CreateTask.cshtml" />
+    <Content Include="Views\ManageProject\AddComment.cshtml" />
+    <Content Include="Views\ManageProject\ViewComments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\ProjectFiles\" />
-    <Folder Include="Views\ManageTask\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -462,17 +450,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201711271445455_version1.resx">
-      <DependentUpon>201711271445455_version1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711271909554_version2.resx">
-      <DependentUpon>201711271909554_version2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711290954386_version3.resx">
-      <DependentUpon>201711290954386_version3.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,0 +1,94 @@
+﻿@using System.Globalization
+@{
+    ViewBag.Title = "ViewComments";
+    var comments = ViewBag.AllComment;
+}
+<link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+
+
+<div class="row">
+    <h3 class="section-title">View Comments of a Task</h3>
+    <hr><br>
+
+    <div class="col-md-12">
+        <div class="form-group">
+            <label>Project</label>
+            <input type="text" class="form-control" value=@comments[0].Task.Project.Name disabled>
+        </div>
+
+        <div class="form-group">
+            <label>Task</label>
+            <input type="text" class="form-control" value=@comments[0].Task.Description disabled>
+        </div>
+    </div>
+
+    <hr>
+    <div class="col-md-8">
+        <table id="myTable" class="table" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Comment</th>
+                    <th>By</th>
+                    <th>Date Time</th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in comments)
+                {
+                    <tr>
+                        <td>@item.Value</td>
+                        <td>@item.CommentBy</td>
+                        <td>@item.dateTime.ToString("dd MM yyyy | hh:mm tt", CultureInfo.InvariantCulture)</td>
+
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+
+
+
+    @*<div class="col-md-12">
+        <table id="mytable" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Comment</th>
+                    <th>By</th>
+                    <th>Date Time</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in comments)
+                {
+                    <tr>
+                        <td>@item.Value</td>
+                        <td>@item.CommentBy</td>
+                        <td>@item.dateTime.ToString("dd MM yyyy | hh:mm tt", CultureInfo.InvariantCulture)</td>
+
+                    </tr>
+                }
+                
+           </tbody>
+        </table>
+    </div>*@
+
+</div>
+
+
+@section Scripts{
+
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/DataTables/dataTables.bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+        });
+    </script>
+
+
+}

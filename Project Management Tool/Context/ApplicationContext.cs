@@ -14,7 +14,7 @@ namespace Project_Management_Tool.Context
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectTeam> ProjectTeams { get; set; }
         public DbSet<Task> Tasks { get; set; }
-        public DbSet<Comments> Commentses { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
     }
 }
