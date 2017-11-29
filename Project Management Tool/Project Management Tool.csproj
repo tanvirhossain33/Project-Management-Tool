@@ -438,6 +438,7 @@
     <Content Include="Views\ManageProject\AllProject.cshtml" />
     <Content Include="Views\ManageProject\AssignPerson.cshtml" />
     <Content Include="Views\ManageProject\UpdateProjectDetails.cshtml" />
+    <Content Include="Views\ManageProject\ProjectDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\ProjectFiles\" />

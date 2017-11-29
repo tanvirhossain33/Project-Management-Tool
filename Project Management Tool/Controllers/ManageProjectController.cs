@@ -16,13 +16,10 @@ namespace Project_Management_Tool.Controllers
     public class ManageProjectController : Controller
     {
         private ApplicationContext db = new ApplicationContext();
-
-        // GET: ManageProject
+        
         public ActionResult AddProject()
         {
-
             var user = Session["user"] as User;
-
             if(user != null && user.UserDesignationId == 2)
             {
                 IList<SelectListItem> Status = new List<SelectListItem>
@@ -36,14 +33,12 @@ namespace Project_Management_Tool.Controllers
                 ViewBag.Message = null;
                 return View();
             }
-
             return RedirectToAction("Login","Account");
         }
 
         [HttpPost]
         public ActionResult AddProject(Project project, HttpPostedFileBase file)
         {
-
             IList<SelectListItem> Status = new List<SelectListItem>
             {
                 new SelectListItem{Text = "Not Started", Value = "Not Started"},
@@ -52,19 +47,18 @@ namespace Project_Management_Tool.Controllers
                 new SelectListItem{Text = "Cancelled", Value = "Cancelled"}
             };
             ViewBag.Status = new SelectList(Status, "Text", "Value");
-
             string message = "";
-
             db.Projects.Add(project);
             int saveConfirm = 0;
-
             if(file != null && file.ContentLength > 0)
             {
                 try
                 {
                     var fileName = Path.GetFileName(file.FileName);
                     var fileType = Path.GetExtension(fileName);
-                    fileName = fileName + project.CodeName + fileType;
+
+                    var name = fileName.Replace(fileType, project.CodeName);
+                    fileName = name + fileType;
                     var path = Path.Combine(Server.MapPath("~/App_Data/ProjectFiles"), fileName);
                     file.SaveAs(path);
                     saveConfirm = 1;
@@ -107,9 +101,7 @@ namespace Project_Management_Tool.Controllers
                     message = "Project Created Failed";
                 }
             }
-
             ViewBag.Message = message;
-
             return View();
         }
 
@@ -124,7 +116,6 @@ namespace Project_Management_Tool.Controllers
                 ViewBag.ProjectTeam = db.ProjectTeams.ToList();
                 return View();
             }
-
             return RedirectToAction("Login","Account");
         }
 
@@ -136,10 +127,8 @@ namespace Project_Management_Tool.Controllers
             {
                 ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Name");
                 ViewBag.UserId = new SelectList(db.Users.Where(c => c.UserDesignationId != 1), "Id", "Name");
-                
                 string message = "";
                 var any = db.ProjectTeams.Any(c => c.ProjectId == projectTeam.ProjectId && c.UserId == projectTeam.UserId);
-
                 if(!any)
                 {
                     db.ProjectTeams.Add(projectTeam);
@@ -157,36 +146,25 @@ namespace Project_Management_Tool.Controllers
                 {
                     message = "This Project Already assigned to this person";
                 }
-
-
                 ViewBag.Message = message;
                 ViewBag.ProjectTeam = db.ProjectTeams.ToList();
                 return View();
             }
-
             return RedirectToAction("Login", "Account");
         }
-
-
-
+        
         public ActionResult AllProject()
         {
             var user = Session["user"] as User;
-
             if (user != null && user.UserDesignationId != 1)
             {
-                
                 var proj = db.ProjectTeams.GroupBy(b => new { b.Project.Id, b.Project.Name, b.Project.CodeName, b.Project.Status }).Select(g => new { g.Key.Id, g.Key.Name, g.Key.CodeName, g.Key.Status, Count = g.Count() }).ToList();
-
                 var task = db.Tasks.GroupBy(b => new { b.Project.Id }).Select(g => new { g.Key.Id, Count = g.Count() }).ToList();
-
                 var result = proj.Join(task,
                     a => a.Id,
                     b => b.Id,
                     (b, a) => new { Member = b, Task = a }).ToList();
-
                 List<ProjectInvolved> list = new List<ProjectInvolved>();
-
                 foreach(var item in result)
                 {
                     ProjectInvolved projectInvolved = new ProjectInvolved()
@@ -200,18 +178,15 @@ namespace Project_Management_Tool.Controllers
                     };
                     list.Add(projectInvolved);
                 }
-                
                 ViewBag.AllProject = list;
                 return View();
             }
             return RedirectToAction("Login", "Account");
-
         }
 
         public ActionResult UpdateProjectDetails(int id)
         {
             var user = Session["user"] as User;
-
             if (user != null && user.UserDesignationId == 2)
             {
                 IList<SelectListItem> Status = new List<SelectListItem>
@@ -226,7 +201,6 @@ namespace Project_Management_Tool.Controllers
                 ViewBag.Details = db.Projects.FirstOrDefault(c => c.Id == id);
                 return View();
             }
-
             return RedirectToAction("Login", "Account");
         }
 
@@ -241,12 +215,9 @@ namespace Project_Management_Tool.Controllers
                     new SelectListItem{Text = "Cancelled", Value = "Cancelled"}
                 };
             ViewBag.Status = new SelectList(Status, "Text", "Value");
-
-            ViewBag.Details = db.Projects.FirstOrDefault(c => c.Id == id);
-
-
+            var details = db.Projects.FirstOrDefault(c => c.Id == id);
+            ViewBag.Details = details;
             string message = "";
-
             var update = db.Projects.Find(id);
             update.Name = project.Name;
             update.Description = project.Description;
@@ -256,14 +227,14 @@ namespace Project_Management_Tool.Controllers
             update.Status = project.Status;
             db.Entry(update).State = EntityState.Modified;
             int saveConfirm = 0;
-
             if (file != null && file.ContentLength > 0)
             {
                 try
                 {
                     var fileName = Path.GetFileName(file.FileName);
                     var fileType = Path.GetExtension(fileName);
-                    fileName = fileName + project.CodeName + fileType;
+                    var name = fileName.Replace(fileType, details.CodeName);
+                    fileName = name + fileType;
                     var path = Path.Combine(Server.MapPath("~/App_Data/ProjectFiles"), fileName);
                     file.SaveAs(path);
                     saveConfirm = 1;
@@ -286,7 +257,6 @@ namespace Project_Management_Tool.Controllers
                     message = "Project Update Failed";
                 }
             }
-            
             if (saveConfirm == 1)
             {
                 var rowChanged = db.SaveChanges();
@@ -299,10 +269,75 @@ namespace Project_Management_Tool.Controllers
                     message = "Project Update Failed";
                 }
             }
-
             ViewBag.Message = message;
-
             return View();
         }
+
+        public ActionResult ProjectDetails(int id)
+        {
+            var user = Session["user"] as User;
+
+            if(user != null && user.UserDesignationId != 1)
+            {
+                var projectDetails = db.Projects.FirstOrDefault(c => c.Id == id);
+                var assignedMember = db.ProjectTeams.Where(c => c.ProjectId == id).ToList();
+
+
+                var dir = new System.IO.DirectoryInfo(Server.MapPath("~/App_Data/ProjectFiles"));
+                System.IO.FileInfo[] fileNames = dir.GetFiles("*"+projectDetails.CodeName + ".*");
+
+                List<string> list = new List<string>();
+
+                if(fileNames.Length != 0)
+                {
+                    foreach (var item in fileNames)
+                    {
+                        string str = item.FullName.Replace(projectDetails.CodeName + item.Extension, item.Extension);
+                        str = str.Replace(item.DirectoryName + "\\", "");
+                        list.Add(str);
+                    }
+                }
+                else
+                {
+                    list = null;
+                }
+                
+
+                ViewBag.ProjectDetails = projectDetails;
+                ViewBag.AssignMember = assignedMember;
+                ViewBag.FileNames = list;
+                return View();
+            }
+
+            return RedirectToAction("Login","Account");
+        }
+
+        public ActionResult DownloadFile(string fileName, string code)
+        {
+            var session = Session["user"] as User;
+            if (session != null && session.UserDesignationId != 1)
+            {
+
+                string[] s = fileName.Split('.');
+                int len = s.Length;
+                string extension = "." + s[len - 1];
+                string name = fileName.Replace(extension, code + extension);
+
+                var dir = new System.IO.DirectoryInfo(Server.MapPath("~/App_Data/ProjectFiles"));
+                System.IO.FileInfo[] fileNames = dir.GetFiles(name);
+                
+                if (fileNames.Length > 0)
+                {
+                    var data = File("~/App_Data/ProjectFiles/" + name, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+                    return data;
+                }
+                
+            }
+            
+
+
+            return RedirectToAction("Login", "Account");
+        }
+
     }
 }

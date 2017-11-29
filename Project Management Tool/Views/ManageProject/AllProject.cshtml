@@ -40,7 +40,7 @@
                             <td>@item.NOM</td>
                             <td>@item.NOT</td>
                             <td>
-                                @Html.ActionLink("Details", "UpdateUser", new { id = item.Id }, new { @class = "btn btn-success" })
+                                @Html.ActionLink("Details", "ProjectDetails", new { id = item.Id }, new { @class = "btn btn-success" })
                                 @if(user != null && user.UserDesignationId == 2)
                                 {
                                     @Html.ActionLink("Update Project", "UpdateProjectDetails", new { id = item.Id }, new { @class = "btn btn-info" })
