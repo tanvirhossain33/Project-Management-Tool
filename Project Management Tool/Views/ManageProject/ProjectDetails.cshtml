@@ -9,6 +9,7 @@
     
 }
 
+<link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
 <style>
     .scrollable-menu {
         height: auto;
@@ -23,37 +24,37 @@
     <div class="col-md-4">
         <div class="form-group">
             <label>Name</label>
-            <input type="text" class="form-control" value=@projectDetails.Name disabled>
+            <div class="well well-sm">@projectDetails.Name</div>
         </div>
 
         <div class="form-group">
             <label>Code Name</label>
-            <input type="text" class="form-control" value=@projectDetails.CodeName disabled>
+            <div class="well well-sm">@projectDetails.CodeName</div>
         </div>
 
         <div class="form-group">
             <label>Description</label>
-            <textarea class="form-control" rows="4" disabled> @projectDetails.Description</textarea>
+            <div class="well well-lg">@projectDetails.Description</div>
         </div>
 
         <div class="form-group">
             <label>Status</label>
-            <input type="text" class="form-control" value=@projectDetails.Status disabled>
+            <div class="well well-sm">@projectDetails.Status</div>
         </div>
 
         <div class="form-group">
             <label>Possible Start Date</label>
-            <input type="text" class="form-control" value=@projectDetails.StartDate disabled>
+            <div class="well well-sm">@projectDetails.StartDate.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture)</div>
         </div>
 
         <div class="form-group">
             <label>Possible End Date</label>
-            <input type="text" class="form-control" value=@projectDetails.EndDate disabled>
+            <div class="well well-sm">@projectDetails.EndDate.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture)</div>
         </div>
 
         <div class="form-group">
             <label>Duration (in Days)</label>
-            <input type="text" class="form-control" value=@projectDetails.Duration disabled>
+            <div class="well well-sm">@projectDetails.Duration</div>
         </div>
 
         <div class="form-group">
@@ -76,8 +77,6 @@
 
                 </ul>
             }
-            
-                
             
         </div>
 
@@ -116,11 +115,11 @@
             
             <div style="text-align: right">
                 @Html.ActionLink("Create New Task", "CreateTask", new { projectId = projectDetails.Id}, new { @class = "btn btn-info" })
-                @Html.ActionLink("Add Comment", "AddComment", new { projectId = projectDetails.Id }, new { @class = "btn btn-success" })
+                @Html.ActionLink("New Comment", "AddComment", new { projectId = projectDetails.Id }, new { @class = "btn btn-success" })
             </div>
             
-            
             <br>
+            
             <table id="myTable" class="table" cellspacing="0" width="100%">
                 <thead>
                     <tr>
@@ -129,8 +128,7 @@
                         <th>Priority</th>
                         <th>Assigned By</th>
                         <th>Due Date</th>
-                        <th>
-                        <th>
+                        <th></th>
                     </tr>
                 </thead>
 
@@ -142,7 +140,7 @@
                             <td>@item.User.Name</td>
                             <td>@item.Priority</td>
                             <td>@item.AssignedByUser</td>
-                            <td>@item.DueDate.ToString("dd/M/yyyy", CultureInfo.InvariantCulture)</td>
+                            <td>@item.DueDate.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture)</td>
                             <td>
                                 
                                 @Html.ActionLink("View Comments", "ViewComments", new { id = item.Id }, new { @class = "btn btn-info" })
@@ -159,7 +157,7 @@
 
 @section Scripts{
 <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-
+<script src="~/Content/DataTables/dataTables.bootstrap.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $('#myTable').DataTable();

@@ -512,6 +512,10 @@ namespace Project_Management_Tool.Controllers
             if(user != null && user.UserDesignationId != 1)
             {
                 var comments = db.Comments.Where(c => c.TaskId == id).ToList();
+                var taskInfo = db.Tasks.FirstOrDefault(c => c.Id == id);
+                
+
+                ViewBag.TaskInfo = taskInfo;
                 ViewBag.AllComment = comments;
                 return View();
             }
