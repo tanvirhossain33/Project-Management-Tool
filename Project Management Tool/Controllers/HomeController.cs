@@ -91,7 +91,7 @@ namespace Project_Management_Tool.Controllers
                 .AddTitle("Project Users Ratio")
                 .AddLegend()
                 .AddSeries(
-                    name: "Project",
+                    name: "Projects",
                     chartType: "pie",
                     xValue: list ,
                     yValues: projectCount);
@@ -116,7 +116,7 @@ namespace Project_Management_Tool.Controllers
             .AddTitle("Number of User per Project")
             .AddLegend()
             .AddSeries(
-                
+                name: "Projects",
                 chartType: "column",
                 xValue: list,
                 yValues: projectCount );
