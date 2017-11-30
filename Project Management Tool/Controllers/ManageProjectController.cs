@@ -158,35 +158,45 @@ namespace Project_Management_Tool.Controllers
             var user = Session["user"] as User;
             if (user != null && user.UserDesignationId != 1)
             {
-                var proj = db.ProjectTeams.GroupBy(b => new { b.Project.Id, b.Project.Name, b.Project.CodeName, b.Project.Status, b.UserId }).Select(g => new { g.Key.Id, g.Key.Name, g.Key.CodeName, g.Key.Status, g.Key.UserId, Count = g.Count() }).ToList();
-                var task = db.Tasks.GroupBy(b => new { b.Project.Id }).Select(g => new { g.Key.Id, Count = g.Count() }).ToList();
-                var result = proj.Join(task,
-                    a => a.Id,
-                    b => b.Id,
-                    (b, a) => new { Member = b, Task = a }).ToList();
+                var proj = db.ProjectTeams.GroupBy(b => new { b.Project.Id, b.Project.Name, b.Project.CodeName, b.Project.Status })
+                    .Select(g => new { g.Key.Id, g.Key.Name, g.Key.CodeName, g.Key.Status, Count = g.Count() }).ToList();
+                //var task = db.Tasks.GroupBy(b => new { b.Project.Id }).Select(g => new { g.Key.Id, Count = g.Count() }).ToList();
+                var task = db.Projects.Where(c => c.Tasks.Count >= 0).ToList();
+
+
+
+
                 List<ProjectInvolved> list = new List<ProjectInvolved>();
-                foreach(var item in result)
+                int i = 0;
+                foreach (var item in proj)
                 {
-                    if(item.Member.UserId == user.Id)
+                    var any = db.ProjectTeams.Any(c => c.ProjectId == item.Id && c.UserId == user.Id);
+
+                    if (any)
                     {
                         ProjectInvolved projectInvolved = new ProjectInvolved()
                         {
-                            Id = item.Member.Id,
-                            Name = item.Member.Name,
-                            CodeName = item.Member.CodeName,
-                            Status = item.Member.Status,
-                            NOM = item.Member.Count,
-                            NOT = item.Task.Count,
-                            UserId = item.Member.UserId
+                            Id = item.Id,
+                            Name = item.Name,
+                            CodeName = item.CodeName,
+                            Status = item.Status,
+                            NOM = item.Count,
+                            NOT = task[i].Tasks.Count()
                         };
                         list.Add(projectInvolved);
                     }
+                    i++;
                     
                 }
                 ViewBag.AllProject = list;
                 return View();
             }
             return RedirectToAction("Login", "Account");
+        }
+        private int Max(int val1, int val2)
+        {
+            if (val1 > val2) return val1;
+            else return val2;
         }
 
         public ActionResult UpdateProjectDetails(int id)
