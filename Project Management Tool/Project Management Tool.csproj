@@ -436,6 +436,9 @@
     <Content Include="Views\ManageProject\AddComment.cshtml" />
     <Content Include="Views\ManageProject\ViewComments.cshtml" />
     <Content Include="Views\Home\Chart.cshtml" />
+    <Content Include="Views\Home\BarChart.cshtml" />
+    <Content Include="Views\Home\PieChartForTaskRatio.cshtml" />
+    <Content Include="Views\Home\BarChartForTaskRatio.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\ProjectFiles\" />

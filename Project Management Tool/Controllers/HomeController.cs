@@ -40,32 +40,139 @@ namespace Project_Management_Tool.Controllers
             return View(model);
         }
 
+        public ActionResult BarChart(int? page)
+        {
+            var model = new ChartModel()
+            {
+                Chart = GetBarChart()
 
-    private Chart GetChart()
-    {
+            };
+            return View(model);
+        }
+
+        public ActionResult PieChartForTaskRatio(int? page)
+        {
+            var model = new ChartModel()
+            {
+                Chart = GetPieChartForTask()
+
+            };
+            return View(model);
+        }
+
+        public ActionResult BarChartForTaskRatio(int? page)
+        {
+            var model = new ChartModel()
+            {
+                Chart = GetBarChartForTask()
+
+            };
+            return View(model);
+        }
+
+
+        private Chart GetChart()
+        {
+                var projects = db.Projects.ToList();
+                List<string> list = new List<string>();
+                foreach(var item in projects)
+                {
+                    list.Add(item.Name);
+                }
+
+                
+                List<string> projectCount = new List<string>();
+                foreach(var item in projects)
+                {
+                    projectCount.Add(item.ProjectTeams.Count().ToString());
+                }
+
+                return new Chart(500, 400, ChartTheme.Blue)
+                .AddTitle("Project Users Ratio")
+                .AddLegend()
+                .AddSeries(
+                    name: "Project",
+                    chartType: "pie",
+                    xValue: list ,
+                    yValues: projectCount);
+        }
+
+        private Chart GetBarChart()
+        {
             var projects = db.Projects.ToList();
             List<string> list = new List<string>();
-            foreach(var item in projects)
+            foreach (var item in projects)
+            {
+                list.Add(item.Name);
+            }
+            
+            List<string> projectCount = new List<string>();
+            foreach (var item in projects)
+            {
+                projectCount.Add(item.ProjectTeams.Count().ToString());
+            }
+
+            return new Chart(500, 400, ChartTheme.Blue)
+            .AddTitle("Number of User per Project")
+            .AddLegend()
+            .AddSeries(
+                
+                chartType: "column",
+                xValue: list,
+                yValues: projectCount );
+        }
+
+        private Chart GetPieChartForTask()
+        {
+            var projects = db.Projects.ToList();
+            List<string> list = new List<string>();
+            foreach (var item in projects)
+            {
+                list.Add(item.Name);
+            }
+            
+            List<string> tasks = new List<string>();
+            foreach (var item in projects)
+            {
+                tasks.Add(item.Tasks.Count().ToString());
+            }
+
+            return new Chart(500, 400, ChartTheme.Blue)
+            .AddTitle("Project Tasks Ratio")
+            .AddLegend()
+
+            .AddSeries(
+                name: "Project",
+                chartType: "pie",
+                xValue: list,
+                yValues: tasks);
+        }
+
+        private Chart GetBarChartForTask()
+        {
+            var projects = db.Projects.ToList();
+            List<string> list = new List<string>();
+            foreach (var item in projects)
             {
                 list.Add(item.Name);
             }
 
-            var projectTeam = db.ProjectTeams.GroupBy(b => b.ProjectId).Select(g => new { ProjectId = g.Key, Count = g.Count() });
-            List<string> projectCount = new List<string>();
-            foreach(var item in projectTeam)
+            List<string> tasks = new List<string>();
+            foreach (var item in projects)
             {
-                projectCount.Add(item.Count.ToString());
+                tasks.Add(item.Tasks.Count().ToString());
             }
 
-            return new Chart(600, 400, ChartTheme.Blue)
-            .AddTitle("Number Of Project Users")
+            return new Chart(500, 400, ChartTheme.Blue)
+            .AddTitle("Number of Task per Project")
             .AddLegend()
+
             .AddSeries(
                 name: "Project",
-                chartType: "Pie",
-                xValue: list /*new[] { "Digg", "DZone", "DotNetKicks", "StumbleUpon" }*/,
-                yValues: projectCount /*new[] { "150000", "180000", "120000", "250000" }*/);
-    }
+                chartType: "column",
+                xValue: list,
+                yValues: tasks);
+        }
 
-}
+    }
 }

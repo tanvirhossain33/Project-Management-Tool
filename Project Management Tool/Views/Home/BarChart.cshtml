@@ -1,0 +1,7 @@
+﻿@model Project_Management_Tool.Models.ChartModel
+@{
+    ViewBag.Title = "Chart";
+}
+
+@Model.Chart.Write(format: "png")
+

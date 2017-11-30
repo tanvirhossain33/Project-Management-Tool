@@ -76,13 +76,29 @@
         </div>
 
     </div>
-
+    <br>
     <div class="row">
-        <div class="col-md-4">
-            @*@Model.Chart.Write(format: "png")*@
+        <div class="col-md-6">
+            
             <img src="@Url.Action("Chart")" alt="Chart is here" />
         </div>
+        <div class="col-md-6">
+            
+            <img src="@Url.Action("BarChart")" alt="Chart is here" />
+        </div>
         
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-6">
+
+            <img src="@Url.Action("PieChartForTaskRatio")" alt="Chart is here" />
+        </div>
+        <div class="col-md-6">
+
+            <img src="@Url.Action("BarChartForTaskRatio")" alt="Chart is here" />
+        </div>
+
     </div>
     
 </div>
